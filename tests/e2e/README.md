@@ -48,7 +48,7 @@ random one, for the control API. The explorer suite uses your real tokens
 
 - **One `serve` per suite** (`support/serve.ts`), started on free ports with `--reset`, so every
   run starts from an empty database. It is ready once `GET <api>/.rayfin-local/health` and the
-  frontend URL from the startup banner answer. Stopping kills the process tree
+  frontend URL from the startup banner answer. Stopping requests a graceful shutdown on Unix
   (`taskkill /T /F` on Windows) and checks that both ports are free again.
 - **Suites start in the Playwright runner** (`support/suites.ts`), on the first test that needs
   them, and stop in the global teardown. So they survive Playwright replacing its worker after a
@@ -60,7 +60,8 @@ random one, for the control API. The explorer suite uses your real tokens
   scenario to the next; a new worker signs in again. Every test checks that it caused no console
   errors, uncaught exceptions, failed requests or HTTP errors beyond the ones it expects.
 - **Sign-in** (`support/portal.ts`) clicks through the emulated Fabric popup: the run's first
-  sign-in signs up `e2e-<random>@example.com`, later ones sign in.
+  sign-in signs up `e2e-<random>@example.com`, later ones sign in. The fixture starts with automatic
+  sign-in disabled; its automatic-sign-in tests switch the identity to the local developer.
 
 ## The fixture suite
 

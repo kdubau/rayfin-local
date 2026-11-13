@@ -167,15 +167,19 @@ export class ServeProcess {
     return this.#output.replace(ANSI, '');
   }
 
-  /** Kills the process tree and checks that its ports are free again. */
+  /** Stops the server and checks that its ports are free again. */
   async stop(): Promise<void> {
     if (this.#stopped) return;
     this.#stopped = true;
     process.off('exit', this.#killOnExit);
     if (this.#child.exitCode === null && this.#child.signalCode === null) {
-      killTree(this.info.pid);
+      if (process.platform === 'win32') killTree(this.info.pid);
+      else this.#child.kill('SIGTERM');
       const exited = await Promise.race([this.#exited.then(() => true), sleep(15_000).then(() => false)]);
-      if (!exited) throw new Error(`rayfin-local (pid ${this.info.pid}) did not exit after it was killed.`);
+      if (!exited) {
+        killTree(this.info.pid);
+        throw new Error(`rayfin-local (pid ${this.info.pid}) did not shut down within 15 seconds.`);
+      }
     }
     forgetPid(this.info.pid);
     await new Promise<void>((resolve) => this.#log.end(resolve));

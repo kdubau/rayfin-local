@@ -49,6 +49,7 @@ export async function startFixtureSuite(): Promise<RunningSuite> {
       projectDir: FIXTURE_DIR,
       label: 'fixture',
       env: { ...tokens, RAYFIN_LOCAL_CONTROL_TOKEN: controlToken },
+      args: ['--sign-in-as', 'none'],
     });
     return {
       info: {

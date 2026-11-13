@@ -11,7 +11,7 @@ import {
   expectOutcomeOk,
   type SessionInfo,
 } from './support/fixture-app.ts';
-import { expect, test } from './support/fixtures.ts';
+import { expect, test, type App } from './support/fixtures.ts';
 import type { RecordedRequest } from './support/mock-powerbi.ts';
 import { freePorts } from './support/ports.ts';
 import { signInThroughPopup } from './support/portal.ts';
@@ -28,6 +28,19 @@ import { ServeProcess } from './support/serve.ts';
 const DAX_QUERY = 'EVALUATE ROW("answer", 42)';
 const WORKSPACE_ID = '00000000-0000-0000-0000-00000000aaaa';
 const ITEM_ID = '00000000-0000-0000-0000-00000000bbbb';
+
+async function signInAsDeveloper(app: App): Promise<void> {
+  if (!app.info.controlToken) throw new Error('The fixture suite needs a control token.');
+  const response = await fetch(`${app.info.serve.apiUrl}/.rayfin-local/control/identity`, {
+    method: 'PUT',
+    headers: {
+      authorization: `Bearer ${app.info.controlToken}`,
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({ kind: 'developer' }),
+  });
+  expect(response.status, await response.text()).toBe(200);
+}
 
 test('config: the app talks to the local backend', async ({ app }, testInfo) => {
   await openFixtureApp(app);
@@ -231,6 +244,7 @@ test('sign-out: the session ends', async ({ app }) => {
 });
 
 test('auto-sign-in: the app signs itself in as the developer, with no popup', async ({ app }) => {
+  await signInAsDeveloper(app);
   await openFixtureApp(app);
   const { page } = app;
   let popups = 0;
@@ -262,6 +276,7 @@ test.describe('stale sessions', () => {
   const signedOut = { isAuthenticated: false, user: null };
 
   test('after a data reset, a reload signs the app in again', async ({ app }) => {
+    await signInAsDeveloper(app);
     await openFixtureApp(app);
     const { page, info } = app;
     expect(await expectOk<SessionInfo>(page, 'auto-sign-in')).toMatchObject({ isAuthenticated: true });

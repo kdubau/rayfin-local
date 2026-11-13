@@ -2,7 +2,7 @@
 //! `pathPattern` when its `check` (if any) holds for the caller and the object.
 //!
 //! `anonymous` rules apply to every caller, `authenticated` rules to signed-in callers; other
-//! roles never apply (1.36.2 folders only have `authenticated` rules). A `check` is evaluated like
+//! roles never apply (2.0.0 folders only have `authenticated` rules). A `check` is evaluated like
 //! the data path's policies: `eq null` / `ne null` test for a missing or null value, any other
 //! comparison with a missing or null value is false, and strings compare case-insensitively
 //! (Fabric's collation).

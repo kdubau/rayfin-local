@@ -4,7 +4,7 @@
 //! automatic sign-in for rayfin-local's dev server (the [`SignInAs`] identity).
 //! Implements [`rl_model::CallerResolver`] for the other routes.
 //!
-//! The wire contract is the real Rayfin auth service's, as the SDK 1.36.2 sees it: see
+//! The wire contract is the real Rayfin auth service's, as the SDK 2.0.0 sees it: see
 //! [`AuthService::router`] for the routes.
 
 mod entra;
